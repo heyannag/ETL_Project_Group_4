@@ -10,15 +10,12 @@
 * [Objective](#Objective)
 * [Technologies](#Technologies)
 * [ETL](#ETL)
-* [ToDo](#ToDo)
 * [Troubleshooting](#Troubleshooting)
 
 # Objective | Create a Database Utilizing ETL on Real Datasets
 Organize data from multiple databases in order to determine similar characteristics of Grammy-winning songs between the years of 2010 and 2019 per streaming platform Spotify.
 
-    * Extract: your original data sources and how the data was formatted (CSV, JSON, pgAdmin 4, etc).
-    * Transform: what data cleaning or transformation was required.
-    * Load: the final database, tables/collections, and why this was chosen.
+Our final production table combines the Grammy song nominations and winners from 2010 - 2019 with the top Spotify tracks for the same years. (spotify_join_grammy.csv)
 
 ## Project Proposal (add/export Google Doc in repo)
 
@@ -68,6 +65,9 @@ Our datasets were obtained on Kaggle at the following links:
 
 We decided to work in PostgreSQL due to the relational structure of our datasets. 
 
+Our final production table combines the Grammy song nominations and winners from 2010 - 2019 and the top Spotify tracks for the same years. 
+* The final tables or collections that will be used in the production database.
+
 ### Steps: Tables/Collections
 
 Grammy 
@@ -83,86 +83,19 @@ Grammy
            winner VARCHAR NOT NULL
            );
       '''
-
 Spotify 
 Created table with the following columns: 
 
-    '''
-     DROP TABLE IF EXISTS spotify;
-           CREATE TABLE spotify(
-               id VARCHAR (30) NOT NULL,
-               title VARCHAR NOT NULL,
-               artist VARCHAR(30) NOT NULL,
-               top_genre VARCHAR(30) NOT NULL,
-               year INT NOT NULL,
-               bpm INT NOT NULL,
-               nrgy INT NOT NULL,
-               dnce INT NOT NULL,
-               dB INT NOT NULL,
-               live INT NOT NULL,
-               val INT NOT NULL,
-               dur INT NOT NULL,
-               acous INT NOT NULL,
-               spch INT NOT NULL,
-               pop INT NOT NULL
-               );
-         '''
+![Create_Table](PostgreSQL/Create_Table.png)
 
 We used the JOIN function to combine our two tables into the database. More specifically, we used an INNER JOIN to combine the information under *nominee* (Grammy) and *title* (Spotify).
 
-      '''
-      SELECT spotify.id,
-           spotify.title,
-           spotify.artist,
-           spotify.top_genre,
-           spotify.year,
-           spotify.bpm,
-           spotify.nrgy,
-           spotify.dnce,
-           spotify.db,
-           spotify.live,
-           spotify.val,
-           spotify.dur,
-           spotify.acous,
-           spotify.spch,
-           spotify.pop,
-           grammys.category,
-           grammys.nominee,
-           grammys.workers,
-           grammys.winner
-         FROM spotify
-         INNER JOIN grammys ON
-         spotify.title = grammys.nominee;
-        '''
+![Inner_Join](PostgreSQL/Inner_Join.png)
 
-## Data Cleanup & Analysis
+# Troubleshooting
 
-Once you have identified your datasets, perform ETL on the data. Make sure to plan and document the following:
 
-* The sources of data that you will extract from.
 
-* The type of transformation needed for this data (cleaning, joining, filtering, aggregating, etc).
 
-* The type of final production database to load the data into (relational or non-relational).
 
-* The final tables or collections that will be used in the production database.
 
-You will be required to submit a final technical report with the above information and steps required to reproduce your ETL process.
-
-## Project Report
-
-At the end of the week, your team will submit a Final Report that describes the following:
-
-* **E**xtract: your original data sources and how the data was formatted (CSV, JSON, pgAdmin 4, etc).
-
-* **T**ransform: what data cleaning or transformation was required.
-
-* **L**oad: the final database, tables/collections, and why this was chosen.
-
-Please upload the report to Github and submit a link to Bootcampspot.
-
-- - -
-
-### Copyright
-
-Coding Boot Camp © 2019. All Rights Reserved.
