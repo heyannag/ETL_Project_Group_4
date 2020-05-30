@@ -94,6 +94,10 @@ We used the JOIN function to combine our two tables into the database. More spec
 
 # Troubleshooting
 
+* Started with ambition to work with API's - Spotify, Apple Music, and Youtube. 
+	* Note, the Spotify dataset on Kaggle indicates the information was obtained by Spotify's API
+* Changed course to work with existing csv data for the purpose of the ETL project
+* While working with API's the main challenges were working with all the necessary components and downloading all the suggested packages we were unfamiliar with using
 
 
 
