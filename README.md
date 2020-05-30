@@ -1,5 +1,5 @@
-<<<<<<< HEAD
 # ETL Project | Group 4
+
 ## Create to create Top 5 Playlists in a user's Spotify Account 
 
 ## Table of Contents
