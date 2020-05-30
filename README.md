@@ -1,112 +1,168 @@
 # ETL Project | Group 4
 
-## Create to create Top 5 Playlists in a user's Spotify Account 
+## Team
+* Kara
+* Bean
+* Anna
+
 
 ## Table of Contents
+* [Objective](#Objective)
 * [Technologies](#Technologies)
-* [Setup](#LocalSetup)
+* [ETL](#ETL)
 * [ToDo](#ToDo)
 * [Troubleshooting](#Troubleshooting)
 
+# Objective | Create a Database Utilizing ETL on Real Datasets
+Organize data from multiple databases in order to determine similar characteristics of Grammy-winning songs between the years of 2010 and 2019 per streaming platform Spotify.
 
-## Technologies
-* [Youtube Data API v3]
-* [Spotify Web API]
-* [Requests Library v 2.22.0]
-* [Youtube_dl v 2020.01.24]
+    * Extract: your original data sources and how the data was formatted (CSV, JSON, pgAdmin 4, etc).
+    * Transform: what data cleaning or transformation was required.
+    * Load: the final database, tables/collections, and why this was chosen.
 
-## LocalSetup
-1) Install All Dependencies   
-`pip3 install -r requirements.txt`
+## Project Proposal (add/export Google Doc in repo)
 
-2) Collect You Spotify User ID and Oauth Token From Spotfiy and add it to secrets.py file
-    * To Collect your User ID, Log into Spotify then go here: [Account Overview] and its your **Username**
-    ![alt text](images/userid.png)
-    * To Collect your Oauth Token, Visit this url here: [Get Oauth] and click the **Get Token** button
-    ![alt text](images/spotify_token.png)
+# Technologies
+* Pandas
+* Python3
+* PostgreSQL
 
-3) Enable Oauth For Youtube and download the client_secrets.json   
-    * Ok this part is tricky but its worth it! Just follow the guide here [Set Up Youtube Oauth] ! 
-    If you are having issues check this out [Oauth Setup 2] and this one too [Oauth Setup 3] 
+# ETL
+## Process Documentation
 
-4) Run the File  
-`python3 create_playlist.py`   
-    * you'll immediately see `Please visit this URL to authorize this application: <some long url>`
-    * click on it and log into your Google Account to collect the `authorization code`
+Our datasets were obtained on Kaggle at the following links:
 
+* [Top Spotify Songs 2010-2019](https://www.kaggle.com/leonardopena/top-spotify-songs-from-20102019-by-year)
 
-## ToDo
-* Tests
-* Add Error Handling
+* [Grammy Awards](https://www.kaggle.com/unanimad/grammy-awards)
 
-## Troubleshooting
-* Spotify Oauth token expires very quickly, If you come across a `KeyError` this could
-be caused by an expired token. So just refer back to step 3 in local setup, and generate a new
-token!  
+## E | Extract
+* Downloaded both CSV datasets 
+* Read in CSV data in a Jupyter notebook file with Pandas
+       
+       '''
+        grammy_df=pd.read_csv('the_grammy_awards.csv')
+        grammy_df.head()
+       '''
+## T | Transform
 
+  Grammy Dataset
+   Limited dataset to only include Awards that were given to *songs*
+      
+      '''
+       song_df=grammy_df[grammy_df['category'].str.contains('Song')]
+       '''
+      
+   Reduced dataset to years 2010 - 2019 to more acurately compare with the obtained Spotify dataset
+      
+      '''
+      grammy_df = grammy_df.loc[grammy_df["year"]> 2009]
+      grammy_df.head()
+      '''
+      
+  Spotify Dataset proved to have high quality data, however, when importing the CSV into PgAdmin4 we ran into an unknown/foreign character UTF8 error and the file could not import. We resolved this error by noting the encoding type to LATIN1. 
+  
+  In this stage we uncovered the relational structure of our datasets is the Song/Track's Name. This information was located in Grammy's nominee column and Spotify's title column. 
+  
+## L | Load
 
-   [Youtube Data API v3]: <https://developers.google.com/youtube/v3>
-   [Spotify Web API]: <https://developer.spotify.com/documentation/web-api/>
-   [Requests Library v 2.22.0]: <https://requests.readthedocs.io/en/master/>
-   [Account Overview]: <https://www.spotify.com/us/account/overview/>
-   [Get Oauth]: <https://developer.spotify.com/console/post-playlists/>
-   [Set Up Youtube Oauth]: <https://developers.google.com/youtube/v3/getting-started/>
-   [Oauth Setup 2]:<https://stackoverflow.com/questions/11485271/google-oauth-2-authorization-error-redirect-uri-mismatch/>
-   [Youtube Video]:<https://www.youtube.com/watch?v=7J_qcttfnJA/>
-   [Youtube_dl v 2020.01.24]:<https://github.com/ytdl-org/youtube-dl/>
-   [Oauth Setup 3]:<https://github.com/googleapis/google-api-python-client/blob/master/docs/client-secrets.md/>
-=======
-# ETL_Project_Group_4
-Where is the data coming from? (at least two sources)
-Apple Music API music playlists 
-Spotify API music playlists  
-Grammy’s (https://www.kaggle.com/unanimad/grammy-awards)
+We decided to work in PostgreSQL due to the relational structure of our datasets. 
 
-Where is the data going to? 
-postgres
+### Steps: Tables/Collections
 
-What will be the structure of the data in the final database? What tables/columns/types/etc.
+Grammy 
+	Created table with the following columns: 
+   
+     '''
+      DROP TABLE IF EXISTS grammy;
+         CREATE TABLE grammy(
+           year INT NOT NULL,
+           category VARCHAR NOT NULL,
+           title VARCHAR NOT NULL,
+           workers VARCHAR NOT NULL,
+           winner VARCHAR NOT NULL
+           );
+      '''
 
-End goal to display multiple top 5’ playlists denoted by characteristic, 
+Spotify 
+Created table with the following columns: 
 
-Song title 		String
-Artist name 		String
-User streams 	INT
-Release Date 	FLOAT
-Added Date 		FLOAT
-Song of the Year 	String
-Grammy winner?	Boolean
-Number of playlists	INT
+    '''
+     DROP TABLE IF EXISTS spotify;
+           CREATE TABLE spotify(
+               id VARCHAR (30) NOT NULL,
+               title VARCHAR NOT NULL,
+               artist VARCHAR(30) NOT NULL,
+               top_genre VARCHAR(30) NOT NULL,
+               year INT NOT NULL,
+               bpm INT NOT NULL,
+               nrgy INT NOT NULL,
+               dnce INT NOT NULL,
+               dB INT NOT NULL,
+               live INT NOT NULL,
+               val INT NOT NULL,
+               dur INT NOT NULL,
+               acous INT NOT NULL,
+               spch INT NOT NULL,
+               pop INT NOT NULL
+               );
+         '''
 
+We used the JOIN function to combine our two tables into the database. More specifically, we used an INNER JOIN to combine the information under *nominee* (Grammy) and *title* (Spotify).
 
-Random Thoughts:
+      '''
+      SELECT spotify.id,
+           spotify.title,
+           spotify.artist,
+           spotify.top_genre,
+           spotify.year,
+           spotify.bpm,
+           spotify.nrgy,
+           spotify.dnce,
+           spotify.db,
+           spotify.live,
+           spotify.val,
+           spotify.dur,
+           spotify.acous,
+           spotify.spch,
+           spotify.pop,
+           grammys.category,
+           grammys.nominee,
+           grammys.workers,
+           grammys.winner
+         FROM spotify
+         INNER JOIN grammys ON
+         spotify.title = grammys.nominee;
+        '''
 
-Add tracks to a new playlist on the user’s Spotify account
+## Data Cleanup & Analysis
 
-Are there genres or characteristics that shine on one platform over the other.
-2006 – spotify
-2003 – iTunes/Apple Music - 2015
+Once you have identified your datasets, perform ETL on the data. Make sure to plan and document the following:
 
-***Final product creates new Spotify playlist 
- 
-How do we account for purity of data? – limit to specific playlist
+* The sources of data that you will extract from.
 
-Anna
-View authorization steps for Spotify API authorization
-Discovered OAuth examples Github repository and reviewed before installing Node.js
-Installed node.js
+* The type of transformation needed for this data (cleaning, joining, filtering, aggregating, etc).
 
-Kara
-Downloaded Past Grammy Winners CSV from Kaggle
-Imported to Pandas and saved only the Grammy categories for individual songs into a data frame.
-Exported to a new CSV and pushed to a git branch
+* The type of final production database to load the data into (relational or non-relational).
 
-Lisa
-View authorization steps for Apple Music API
-Create apple certificate
-Create private key
-Manage identifiers
-Troubleshoot 
-Created branch for git work
-Started py doc for import.
->>>>>>> 336ff09ae81777e3241b721f63018ee07de97bc2
+* The final tables or collections that will be used in the production database.
+
+You will be required to submit a final technical report with the above information and steps required to reproduce your ETL process.
+
+## Project Report
+
+At the end of the week, your team will submit a Final Report that describes the following:
+
+* **E**xtract: your original data sources and how the data was formatted (CSV, JSON, pgAdmin 4, etc).
+
+* **T**ransform: what data cleaning or transformation was required.
+
+* **L**oad: the final database, tables/collections, and why this was chosen.
+
+Please upload the report to Github and submit a link to Bootcampspot.
+
+- - -
+
+### Copyright
+
+Coding Boot Camp © 2019. All Rights Reserved.
