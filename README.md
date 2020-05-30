@@ -64,7 +64,7 @@ Our datasets were obtained on Kaggle at the following links:
 We decided to work in PostgreSQL due to the relational structure of our datasets. 
 
 Our final production table combines the Grammy song nominations and winners from 2010 - 2019 and the top Spotify tracks for the same years. 
-* The final tables or collections that will be used in the production database.
+Our database can be used with SQLAlchemy to query the information and return results like, number of nominations/awards per artist, and furthermore, could be used to compare the success of a track based on tempo, decibels, and genre. 
 
 ### Steps: Tables/Collections
 
