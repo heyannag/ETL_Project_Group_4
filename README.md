@@ -17,8 +17,6 @@ Organize data from multiple databases in order to determine similar characterist
 
 Our final production table combines the Grammy song nominations and winners from 2010 - 2019 with the top Spotify tracks for the same years. (spotify_join_grammy.csv)
 
-## Project Proposal (add/export Google Doc in repo)
-
 # Technologies
 * Pandas
 * Python3
