@@ -41,8 +41,8 @@ Our datasets were obtained on Kaggle at the following links:
        '''
 ## T | Transform
 
-  Grammy Dataset
-   Limited dataset to only include Awards that were given to *songs*
+ 
+   Limited the Grammy dataset to only include Awards that were given to *songs*
       
       '''
        song_df=grammy_df[grammy_df['category'].str.contains('Song')]
